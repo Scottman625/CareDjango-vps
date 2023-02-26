@@ -1,0 +1,488 @@
+{% extends 'web/base.html' %} {% block content %}
+{% load static %}
+<!-- main -->
+<main class="main bg-white" id="top" >
+
+  <div class="container pt-5">
+    <div class="row">
+          
+          <div class="col-12 col-md-7 col-lg-8 mb-5 ">
+
+            <div>
+              {% if servant.background_image.url != None %}
+                <img class="card-img-top" style="height: 120px;  object-fit: cover;" src="{{servant.background_image.url}}" alt="照顧者背景圖">
+              {% else %}
+                <img class="card-img-top" style="height: 120px;  object-fit: cover;" src="{% static 'web/assets/img/new/cat_horizontal.jpg' %}" alt="照顧者背景圖"> 
+              {% endif %}
+            </div>
+
+            <div class="container mt-4" style="display: flex; padding-left: 0;" >
+                  
+              <div class="avatar avatar-4xl" >
+                {% if servant.image.url != None %}
+                  <img class="rounded-circle" src="{{servant.image.url}}" alt="" > 
+                {% else %}
+                  <img class="rounded-circle" src="{% static 'web/assets/img/new/cat_horizontal.jpg' %}" alt="" >
+                {% endif %}
+              </div>
+
+              <div class="mx-3 align-self-center">
+                <span class="h5">{{servant.name|slice:"0:1"}}{% if servant.gender == 'M' %}先生{% else %}小姐{% endif %}</span>
+                  <div class="mt-2">
+                    {% for care_type in servant_care_type %}
+                    <span class="purple-border-tag">{{care_type}}</span>
+                    {% endfor %}
+                  </div>
+              </div>
+
+            </div>
+
+            <div class="case-info-font mt-4">
+              <span class="sub-purple-text">語言能力</span>
+              &emsp;{% for userlanguage in servant.user_languages.all %} {{userlanguage.language}} {% endfor %} <br>
+              <p class="text-indent-5 mt-2">
+                <span class="sub-purple-text">服務地區</span>&nbsp;&ensp;
+                {% for location in servant.user_locations.all %}
+                {{location.city}}&emsp;<span class="sub-font">交通費 ${{location.transfer_fee}}/趟</span><br>
+                {% endfor %}
+              </p>
+            </div>
+
+            <hr>
+
+            <p class="small-section-title-purple mt-5">服務項目</p>
+            <div class="case-info-font mb-5 text-indent-28px">
+              {% for userservice in servant.ship_services.all %}
+                {% if userservice.service.id != 1 and  userservice.service.id != 2 and  userservice.service.id != 3 and userservice.service.id != 4 %}
+                  <p><span class="fas fa-check-circle fs-1" style="color: #55D9A0;"></span>&ensp;{{userservice.service}}</p>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <p class="small-section-title-purple mt-5">相關資格文件</p>
+            <div class="case-info-font mb-5 text-indent-28px">
+              <!-- <p><span class="fas fa-times-circle fs-1" style="color: red;"></span>&ensp;未提供 COVID-19 疫苗接種記錄卡</p> -->
+              
+              {% for licenseImage in servant.user_license_images.all %}
+               
+                {% if licenseImage.isPassed %}
+                  <p><span class="fas fa-check-circle fs-1" style="color: #55D9A0;"></span>&ensp;{{licenseImage.license}}</p>
+                {% else %}
+                  {% if licenseImage.license.id == 4 or  licenseImage.license.id == 5 or  licenseImage.license.id == 6 %}
+                    <p><span class="fas fa-times-circle fs-1" style="color:red"></span>&ensp;{{licenseImage.license}}</p>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+       
+            </div>
+
+            <p class="small-section-title-purple mt-5">關於我</p>
+            <div class="case-info-font mb-5 ">
+              {{servant.about_me}}
+            </div>
+
+            <hr>
+
+            <p class="small-section-title-purple mt-5"><strong> {{servant.servant_rate_nums}} </strong>則評價</p>
+            {% for review in reviews %}
+            <div class="section-bg-grey my-3">
+              <div class="row">
+                <div class="col align-self-center" style="display: flex;">
+                  <div class="avatar avatar-3xl" >
+                    <img class="rounded-circle" src="{% static 'web/assets/img/new/cat_horizontal.jpg' %}" alt="" />
+                  </div>
+                  <div class="mx-3 mt-1">
+                    <span class="case-info-font">{{review.case.user.name}}</span>
+                    <p class="case-info-font">{{review.servant_rating_created_at.year}} 年 {{review.servant_rating_created_at.month}} 月</p>
+                  </div>
+                </div>
+                <div class="col align-self-center text-end" style="color: yellow;">
+                  {% for i in review.servant_rating_range %}
+                    <span class="fas fa-star" ></span>
+                  {% endfor %}
+                  {% if review.servant_rating_is_half_star == True %}
+                    <span class="fas fa-star-half-alt" ></span>
+                  {% endif %}
+                  {% for i in review.servant_rating_empty_star_range %}
+                    <i class="fa-regular fa-star"></i>  
+                  {% endfor %}
+                </div>
+                
+              </div>
+              <div class="case-info-font">{{review.servant_comment}}</div>
+            </div>
+            {% endfor %}
+            
+            <p class=" text-center" style="color: black;" type="button" onclick="location.href='{% url 'search_carer_detail' %}?servant={{servant.id}}&reviews=all'"><u>看所有評價</u></p>
+
+          </div>
+
+          <!-- 右側 預定欄位 -->
+          
+          <div class="col-12 col-md-5 col-lg-4 mb-5">
+            <div class="booking-box px-4">
+              <div class="row">
+                <div class="col-1">
+                  <p class="small-section-title-purple" style="font-weight: 700;">{{servant.servant_avg_rating}}</p>
+                </div>
+                <div class="col mx-0" style="color: yellow;">
+                  <div class="col align-self-center " >
+                    {% for i in servant.servant_avg_rate_range %}
+                      <span class="fas fa-star" style=" margin-top: 4px;"></span>
+                    {% endfor %}
+                    {% if servant.servant_avg_rating_is_half_star == True %}
+                      <span class="fas fa-star-half-alt" style="margin-top: 4px;"></span>
+                    {% endif %}
+                    {% for i in servant.servant_avg_rating_empty_star_range %}
+                      <i class="fa-regular fa-star" ></i>  
+                    {% endfor %}
+                    <span class="case-info-font">&ensp;{{servant.servant_rate_nums}}評價</span>
+                  </div>
+                  
+                </div>
+              </div>             
+              <form method="post" enctype="multipart/form-data">{% csrf_token %}
+              <div class="mb-3" style="margin: 0; display: flex;">
+
+                <div class="segment__item">
+                  <input type="radio" class="segment__input"  id="care_type_home" name="care_type" onclick="home.call_backend()" value="home" {% if care_type == 'home' %} checked {% endif %} >
+                  <div class="segment__button" >居家照顧</div>
+                </div>
+          
+                <div class="segment__item">
+                  <input type="radio" class="segment__input"  id="care_type_hospital" name="care_type" onclick="hospital.call_backend()" value="hospital" {% if care_type == 'hospital' %} checked {% endif %} >
+                  <div class="segment__button">醫院看護</div>
+                </div>
+              </div>
+              
+              <div class="case-info-font">
+
+                <span class="news-subtitle">照護地點</span><br>
+                <div class="mt-1 mb-3">
+                  <div class="mt-1 btn-group">
+                    <select class="dropdown-button" id="city_select" name="city"  select>
+                      
+                      {% for city in citys %}
+                        <option style="text-align: center" name="city_option" value="{{city.id}}" {% if city == cityName %} selected="selected" {% endif %}>{{city}}</option>
+                        <!-- <option value="醫院看護">醫院看護</option> -->
+                      {% endfor %}
+                    </select>
+                </div>
+      
+                </div>
+                <span class="news-subtitle mt-2">日期</span><br>
+                <div class="mt-2 mb-3">
+                  <input class="modal-timePicker-button datetimepicker " style="width: 200px;" id="start_end_date" name="start_end_date" type="text" value="{{defaultStartEndDate}}" placeholder="年-月-日 到 年-月-日" data-options='{"mode":"range","dateFormat":"y/m/d","disableMobile":true}' />
+                </div>
+
+                <span class="news-subtitle mt-2">時間類型</span><br>
+                <div class="my-2 " style="display: flex;">
+                  <div class="btn-group">
+                    <button class="dropdown-button dropdown-toggle " type="button" data-bs-toggle="dropdown" data-display="static" aria-haspopup="true"  id="time_type" aria-expanded="false">{% if is_continuous_time == 'True' %}連續時間{% else %}指定時段{% endif %}</button>
+                    
+                    <div class="dropdown-menu py-0">
+                      <div class="card shadow-none border-0" style="width: 15rem;">
+    
+                        <div class="card-body">
+    
+                          <div class="row text-start justify-content-between align-items-center mb-2">
+                            <div class="col-auto">
+                              <h6 class="mb-0">時間類型</h6>
+                            </div>
+                          </div>
+                          <form method="post" enctype="multipart/form-data">{% csrf_token %}
+                            <!-- 時間類型選項 radio -->
+                            <div class="col-auto">
+      
+                              <div class="form-check form-check-inline">
+                                <input class="form-check-input " id="continuous_time" type="radio" name="is_continuous_time" value="True" {% if is_continuous_time == 'True' %} checked {% endif %}/>
+                                <label class="h6" for="inlineRadio2">  連續時間</label>
+                              </div>
+      
+                              <div class="form-check form-check-inline">
+                                <input class="form-check-input "  id="select_time" type="radio" name="is_continuous_time"  value="False" {% if is_continuous_time == 'False' %} checked {% endif %}/>
+                                <label class="h6" for="inlineRadio2">  指定時段</label>
+                              </div>
+      
+                            </div>
+      
+                            <!-- 週間星期 checkbox -->
+                            <div class="col-auto weekdayCheck">
+                              <div class="form-check form-check-inline">
+                                <input class="form-check-input " id="weekdays[]" name="weekdays[]" type="checkbox" value="1" {% if "1" in weekday_list %} checked="" {% endif %} />
+                                <label class="h6" for="weekdays[]">星期一</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                <input class="form-check-input " id="weekdays[]" name="weekdays[]" type="checkbox" value="2" {% if "2" in weekday_list %} checked="" {% endif %} />
+                                <label class="h6" for="weekdays[]">星期二</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                <input class="form-check-input " id="weekdays[]" name="weekdays[]" type="checkbox" value="3" {% if "3" in weekday_list %} checked="" {% endif %}/>
+                                <label class="h6" for="weekdays[]">星期三</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                <input class="form-check-input " id="weekdays[]" name="weekdays[]" type="checkbox" value="4" {% if "4" in weekday_list %} checked="" {% endif %} />
+                                <label class="h6" for="weekdays[]">星期四</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                <input class="form-check-input " id="weekdays[]" name="weekdays[]" type="checkbox" value="5" {% if "5" in weekday_list %} checked="" {% endif %} />
+                                <label class="h6" for="weekdays[]">星期五</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                <input class="form-check-input " id="weekdays[]" name="weekdays[]" type="checkbox" value="6" {% if "6" in weekday_list %} checked="" {% endif %}/>
+                                <label class="h6" for="weekdays[]">星期六</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                <input class="form-check-input " id="weekdays[]" name="weekdays[]" type="checkbox" value="0" {% if "0" in weekday_list %} checked="" {% endif %} />
+                                <label class="h6" for="weekdays[]">星期日</label>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>   
+                <span class="news-subtitle">開始時間 & 結束時間</span><br>
+                <div class="mt-1 mb-3">
+                  <div class="mt-1 btn-group">
+                    <input class="modal-timePicker-button datetimepicker " id="timepicker_startTime" name="timepicker_startTime" type="text" value="{{defaultStartTime}}" placeholder="時:分" data-options='{"enableTime":true,"noCalendar":true,"dateFormat":"H:i","disableMobile":true,"time_24hr":true}' />
+                  </div>
+                  <div class="mt-1 btn-group">
+                    <input class="modal-timePicker-button datetimepicker " id="timepicker_endTime" name="timepicker_endTime" type="text" value="{{defaultEndTime}}" placeholder="時:分" data-options='{"enableTime":true,"noCalendar":true,"dateFormat":"H:i","disableMobile":true,"time_24hr":true}' />
+                  </div>
+
+                </div>
+                
+                <span class="news-subtitle mt-2">費率</span><br>
+                <div class="mt-2 mb-3">
+                  {% if servant.is_hospital == True %}
+                    {% if care_type == 'home' %}
+                      每小時 $<span id="hour_wage" name="hour_wage" >{{servant.home_hour_wage}}</span>｜半天 $<span id="half_day_wage" name="half_day_wage" >{{servant.home_half_day_wage}}</span>｜全天 $<span id="one_day_wage" name="one_day_wage" >{{servant.home_one_day_wage}}</span>
+                    {% else %}
+                      每小時 $<span id="hour_wage" name="hour_wage" >{{servant.hospital_hour_wage}}</span>｜半天 $<span id="half_day_wage" name="half_day_wage" >{{servant.hospital_half_day_wage}}</span>｜全天 $<span id="one_day_wage" name="one_day_wage" >{{servant.hospital_one_day_wage}}</span>
+                    {% endif %}
+                  {% elif servant.is_home == True %}
+                    {% if care_type == 'hospital' %}
+                      每小時 $<span id="hour_wage" name="hour_wage" >{{servant.hospital_hour_wage}}</span>｜半天 $<span id="half_day_wage" name="half_day_wage" >{{servant.hospital_half_day_wage}}</span>｜全天 $<span id="one_day_wage" name="one_day_wage" >{{servant.hospital_one_day_wage}}</span>
+                    {% else %}
+                      每小時 $<span id="hour_wage" name="hour_wage" >{{servant.home_hour_wage}}</span>｜半天 $<span id="half_day_wage" name="half_day_wage" >{{servant.home_half_day_wage}}</span>｜全天 $<span id="one_day_wage" name="one_day_wage" >{{servant.home_one_day_wage}}</span>
+                    {% endif %}
+                  {% endif %}
+                </div>
+                <!-- <div class="mt-2 mb-3">
+                  {% if care_type == '居家照顧' %}
+                    每小時 $<span id="hour_wage" name="hour_wage" >{{servant.home_hour_wage}}</span>｜半天 $<span id="half_day_wage" name="half_day_wage" >{{servant.home_half_day_wage}}</span>｜全天 $<span id="one_day_wage" name="one_day_wage" >{{servant.home_one_day_wage}}</span>
+                  {% else %}
+                    每小時 $<span id="hour_wage" name="hour_wage" >{{servant.hospital_hour_wage}}</span>｜半天 $<span id="half_day_wage" name="half_day_wage" >{{servant.hospital_half_day_wage}}</span>｜全天 $<span id="one_day_wage" name="one_day_wage" >{{servant.hospital_one_day_wage}}</span>
+                  {% endif %}
+                </div> -->
+                
+                <div class="row case-info-font mt-3" id="post_html"> 
+                </div>
+
+                <div class="mt-3">
+                  <a href="{% url 'booking_patient_info' %}">
+                    <button class="full-green-button" id="submit_button">申請預訂</button>
+                  </a>
+                </div>
+                {% if alert_flag %}
+                    <script>alert("無法發訂單給自己!")</script>  
+                {% endif %}
+                <input type="hidden" id="time" >
+              </div>
+              </form>
+            </div>
+          </div>  
+          
+    </div>
+  </div>
+  <script type="text/javascript">
+    
+    function getCookie(name){
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+                  }
+              }
+          }
+          return cookieValue;
+      }
+    const csrftoken = getCookie('csrftoken');
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const servant = urlParams.get('servant');
+    const post_html = document.getElementById('post_html');
+    is_continuous_time = urlParams.get('is_continuous_time');
+    const care_type_home = document.getElementById('care_type_home');
+    const care_type_hospital = document.getElementById('care_type_hospital');
+    const submit_button = document.getElementById('submit_button');
+    const select_time_Btn = document.getElementById('select_time');
+    const city_select = document.getElementById('city_select');
+
+    var home = {
+      call_backend : function (){
+      var care_type = 'home'
+      $.ajax({
+        type: "POST",
+        data: {'care_type':care_type,
+                'servant':servant,
+                'action':'return_wage'},
+        headers: {'X-CSRFToken': csrftoken},
+        url: "{% url 'ajax_return_wage' %}",
+        success: function(response)
+          {
+            const data = response.data
+            $('#hour_wage').html(data.hour_wage);
+            $('#half_day_wage').html(data.half_day_wage);
+            $('#one_day_wage').html(data.one_day_wage);
+          }
+        });
+      }
+    }
+    
+    var hospital = {
+      call_backend : function (){
+      var care_type = 'hospital'
+
+      $.ajax({
+        type: "POST",
+        data: {'care_type':care_type,
+                'servant':servant,
+                'action':'return_wage'},
+        headers: {'X-CSRFToken': csrftoken},
+        url: "{% url 'ajax_return_wage' %}",
+        success: function(response)
+          {
+            const data = response.data
+            $('#hour_wage').html(data.hour_wage);
+            $('#half_day_wage').html(data.half_day_wage);
+            $('#one_day_wage').html(data.one_day_wage);
+          }
+        });
+      }
+    }
+
+    document.getElementById('continuous_time').addEventListener('change', function() {
+      document.getElementById('time_type').innerHTML = '連續時間' ;
+      $('#time').value = 'True';
+    })
+    
+    document.getElementById('select_time').addEventListener('change', function() {
+      document.getElementById('time_type').innerHTML = '指定時段' ;
+      is_continuous_time = 'False';
+      $('#time').value  = 'False';
+      calculate_rate.call();
+    })
+
+    document.getElementById('start_end_date').addEventListener('change', event => {
+      event.preventDefault();
+      start_end_date = $('#start_end_date').val();
+
+      calculate_rate.call();
+    })
+    document.getElementById('timepicker_startTime').addEventListener('change', event => {
+      event.preventDefault();
+      startTime = $('#timepicker_startTime').val();
+      
+      calculate_rate.call();
+    })
+    document.getElementById('timepicker_endTime').addEventListener('change', event => {
+      event.preventDefault();
+      endTime = $('#timepicker_endTime').val();
+      
+      calculate_rate.call();
+    })
+    document.getElementById('continuous_time').addEventListener('change', event => {
+      event.preventDefault();
+      is_continuous_time = 'True';
+      
+      calculate_rate.call();
+    })
+    document.querySelector('.weekdayCheck').addEventListener('change', event => {
+      is_continuous_time = 'False';
+      select_time_Btn.checked = true;
+      document.getElementById('time_type').innerHTML = '指定時段' ;
+      weekdays = []
+      checkboxes = $('input[type=checkbox]:checked')
+
+      for (var i = 0; i < checkboxes.length; i++) {
+        weekdays.push(checkboxes[i].value)
+      };
+      calculate_rate.call();
+    });
+    city_select.addEventListener('change',function(){
+      calculate_rate.call();
+    })
+    $( document ).ready(function() {
+      submit_button.disabled = true;
+      if (!care_type){
+        var care_type = 'home'
+        document.getElementById('care_type_home').checked = true;
+      }
+      start_end_date = "{{defaultStartEndDate}}";
+      weekdays = "{{weekdays}}".split(',');
+      startTime = "{{defaultStartTime}}";
+      endTime = "{{defaultEndTime}}";
+      calculate_rate.call();
+    });
+    function calculate_rate(){
+      city_id = city_select.value;
+      if(care_type_home.checked == true){
+        var care_type = 'home'
+      }else if (care_type_hospital.checked == true ){
+        var care_type = 'hospital'
+      }
+      console.log(servant,city_id,care_type,start_end_date,is_continuous_time,startTime,endTime,weekdays)
+      return $.ajax({
+        type: "POST",
+        data: { 'servant':servant,
+                'city_id':city_id,
+                'care_type':care_type,
+                'start_end_date':start_end_date,
+                'is_continuous_time':is_continuous_time,
+                'startTime':startTime,
+                'endTime':endTime,
+                'weekdays[]':weekdays,
+                'action':'ajax_cal_rate'},
+        headers: {'X-CSRFToken': csrftoken},
+        url: "{% url 'ajax_cal_rate' %}",
+        success: function(response)
+          {
+            const data = response.data;
+            console.log(data);
+            if (data.result == '3'){post_html.innerHTML = `
+            <div class="col-12 align-self-center">
+                  $${data.hour_wage}x${data.total_hours}小時 
+                </div>
+                <div class="col text-end">
+                  <strong>$ </strong><span class="section-title-purple"><strong>${data.base_money}</strong></span><span class="h6"> 起</span> 
+                </div>`;
+                submit_button.disabled = false;
+              }else if (data.result == '1'){
+              post_html.innerHTML = `<span>所選時段不符合該服務者的服務時間</span>`;
+              submit_button.disabled = true;
+            }else if (data.result == '2'){
+              post_html.innerHTML = `<span>所選時段與該服務者已有訂單時間重複</span>`;
+              submit_button.disabled = true;
+            }
+            
+          },
+          error: function (error) {
+            console.log(error);
+            post_html.innerHTML = `
+            <span>請輸入完整訂單資料</span>
+            `
+          }
+      });
+    }
+  </script>
+</main>
+{% endblock %}

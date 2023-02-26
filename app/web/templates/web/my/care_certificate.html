@@ -1,0 +1,159 @@
+{% extends 'web/base.html' %} {% block content %}
+{% load static %}
+<!-- main -->
+<main class="main bg-white" id="top" >
+
+  
+  <div class="col pt-4 text-center">
+    
+    <!-- <button class="small-green-button" name="PDFdownload">
+      <span class="fas fa-cloud-download-alt"></span>
+        下載PDF檔
+    </button> -->
+    
+    <button class="small-green-button" onclick="PrintData()">
+      <span class="fas fa-print"></span>
+        列印此頁
+    </button>
+  </div>
+  <div class="main-class" id="printdiv">
+      <h3 class="text-center mt-6">看護證明書</h3>
+      
+      <div class="container pt-5">
+        <div class="row">
+            <div class="col-12">
+
+                <p class="h5 mt-2">看護資訊</p>
+                <div class="case-info-font mt-2">
+                  <p>看護類型：{% if case.care_type == 'home' %}居家照顧{% else %}醫院看護{% endif %}</p>
+                  <p>看護地點：{{case.city}}</p>
+                  <p class="text-indent-5" >看護時間：{% if case.is_continuous_time == True %}連續時間{% else %} 指定時段{% endif %}<br>{{case.start_datetime.year}}/{{case.start_datetime.month}}/{{case.start_datetime.day}} ({{case.startTimeformat}})~ {{case.end_datetime.year}}/{{case.end_datetime.month}}/{{case.end_datetime.day}} ({{case.endTimeformat}})</p>
+                </div>
+
+                <p class="h5 mt-5">被照顧者資訊</p>
+                <div class="case-info-font mt-2">
+                  <p>性別：{% if case.gender == 'F' %}女{% else %}男{% endif %}</p>
+                  <p>體重：{{case.weight}}</p>
+                  <p>年齡：{{case.age}}</p>
+                  <p>疾病：{% for casedisease in case.case_diseases.all %} {{casedisease.disease}} {% endfor %}</p>
+                  <p>補充說明：{{case.disease_remark}}</p>
+                  <p>身體狀況：{% for casebodycondition in case.case_body_conditions.all %} {{casebodycondition.body_condition}} {% endfor %}</p>
+                  <p class="text-indent-5">補充說明：{{case.conditions_remark}}</p>
+                </div>
+
+                <p class="h5 mt-5">需求服務項目</p>
+                <div class="case-info-font mt-2 mb-5">
+                  {% for caseservice in case.case_services.all %}
+                  <p>
+                    <span class="fas fa-check-circle fs-1" style="color: 55D9A0;"></span>
+                    {{caseservice.service}}
+                  </p>
+                  {% endfor %}
+
+                </div>
+                <div style="page-break-after:always"></div>
+                <p class="h5 mt-2">看護費用</p>
+                <div class="section-bg-grey mt-2 mb-5" style="width: 50%;">
+                  <span class="case-info-font"><strong>基本費用</strong></span>
+                  <div class="row case-info-font">
+                    <div class="col-9">
+                      ${% if order.case.care_type == 'home' %}{{order.servant.home_hour_wage}}{% else %}{{order.servant.hospital_hour_wage}}{% endif %}x{{order.work_hours}}小時
+                    </div>
+                    <div class="col text-end">
+                      $ {{order.base_money}}
+                    </div>
+                  </div>
+                  <br>
+                  <span class="case-info-font"><strong>加價項目</strong></span>
+                  {% for increase_service in order.order_increase_services.all %}
+                    <div class="row case-info-font">
+                      <div class="col-9">
+                        {{increase_service.service}}
+                        &emsp;每小時加 {{increase_service.increase_percent}}% x {{order.work_hours}}小時
+                      </div>
+                      <div class="col text-end">
+                        
+                        $ {{increase_service.increase_money}}
+                        <br>
+                      </div>
+                      
+                    </div>
+                  {% endfor %}
+                  <hr>
+                  <div class="row">
+                    <div class="col-8 case-info-font">
+                      <strong>總計</strong>
+                    </div>
+                    <div class="col text-end " style="color: red;">
+                      <strong>$ {{order.total_money}}</strong> 
+                    </div>
+                  </div>
+
+                </div>
+
+                <hr style="color: black;">
+
+                <p class="h5 mt-5">委託人</p>
+                <div class="case-info-font mt-2">
+                    <p>姓名：{{case.user.name}}</p>
+                    <p>電話：{{case.user.phone}}</p>
+                    <p>簽名：</p>
+                </div>
+
+                <p class="h5 mt-5">照顧者</p>
+                <div class="case-info-font mt-2 mb-9">
+                    <p>姓名：{{case.servant.name}}</p>
+                    <p>電話：{{case.servant.phone}}</p>
+                    <p>簽名：</p>
+                  </div>
+            </div>
+        </div>
+      </div>
+  <style>
+    @media print{
+      html *{
+          height: auto;
+          width: auto;
+      }
+
+
+    /*assing myPagesClass to every div you want to print on single separate A4 page*/
+
+    body .main-class {
+        z-index: 100 !important;
+        visibility: visible !important;
+        position: relative !important;
+        display: block !important;
+        background-color: lightgray !important;
+        height: auto;
+        width: 100%;
+        position: relative !important;
+
+        padding: 0px;
+        top: 70px !important;
+        left: 0 !important;
+        margin: 0 !important;
+        orphans: 0!important;
+        widows: 0!important;
+        overflow: visible !important;
+              }
+    @page{
+        size: A4;
+        margin: 0mm ;
+        orphans: 0!important;
+        widows: 0!important;
+    }}
+      
+  </style>
+  <script>
+    function PrintData(){
+      html = document.body.innerHTML
+      document.body.innerHTML=document.getElementById('top').innerHTML ;
+      window.print(); 
+      document.body.innerHTML = html
+    }
+  </script>
+  </div>
+</main>
+{% endblock %}
+   

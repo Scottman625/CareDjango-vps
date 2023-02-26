@@ -1,0 +1,134 @@
+{% extends 'web/base.html' %} {% block content %}
+{% load static %}
+<!-- main -->
+<main class="main bg-white " id="top">
+
+  <!-- 條件篩選 toggle -->
+  <div class="row">
+    <div class="col mx-5 mt-4">
+      <div class="accordion" id="accordionExample">     
+        <button class="custom-accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+          <span class="fas fa-plus-circle"></span> 展開篩選條件
+        </button>
+        <form method="post" enctype="multipart/form-data">{% csrf_token %}
+          <div class="accordion-collapse collapse" id="collapse1" aria-labelledby="heading1" data-bs-parent="#accordionExample">
+            <div class="row mx-3" >
+      
+              <div class="row col-11 mt-3">
+
+                <!-- 照護類型 -->
+                <div class="col-sm-4 col-md-3 col-lg-2 my-3">
+                  <h5 class="mb-2">照護類型</h5>
+                  <div class="dropdown font-sans-serif d-inline-block mb-2">
+                    <select class="dropdown-button" id="care_type" name="care_type">
+                      <option style="text-align: center" value="home" {% if care_type == "home" %} selected="selected" {% endif %}>居家照顧</option>
+                      <option style="text-align: center" value="hospital" {% if care_type == "hospital"  %} selected="selected" {% endif %}>醫院看護</option>
+                    </select>
+                  </div>
+                </div>
+      
+                <!-- 照護地點 -->
+                <div class="col-sm-4 col-md-3 col-lg-2 my-3">
+                  <h5 class=" mb-2">照護地點</h5>
+                  <div class=" btn-group mb-2">
+                    <select class="dropdown-button" id="city_select" name="city"  select>
+                      {% for city in citys %}
+                      <option style="text-align: center" name="city_option" value="{{city.id}}" {% if city == cityName %} selected="selected" {% endif %}>{{city}}</option>
+                      <!-- <option value="醫院看護">醫院看護</option> -->
+                      {% endfor %}
+                    </select>
+                  </div>
+                  
+                </div>
+
+                <!-- 開始&結束日期 -->
+                <div class="col-sm-4 col-md-6 col-lg-8 my-3 row justify-content-start">
+
+                  <div class="col-sm-10 col-md-6 ">
+                    <label class="h5" for="datepicker_startDate">開始日期</label>
+                    <input class="modal-timePicker-button datetimepicker my-2" id="datepicker_startDate" name="datepicker_startDate" value="{{start_date}}" type="text" placeholder="年-月-日" data-options='{"disableMobile":true,"time_24hr":true}' />
+                  </div>
+                  <div class="col-sm-10 col-md-6 ">
+                    <label class="h5" for="datepicker_endDate">結束日期</label>
+                    <input class="modal-timePicker-button datetimepicker my-2" id="datepicker_endDate" name="datepicker_endDate" value="{{end_date}}" type="text" placeholder="年-月-日" data-options='{"disableMobile":true,"time_24hr":true}' />
+                  </div>
+
+                </div>
+
+              </div>
+          
+              <!-- 篩選button -->
+              <button class="col-xl-4 col-md-6 mt-4 mx-auto full-purple-button" type="submit" name="submit" >
+                搜尋
+              </button>
+              <hr class="mt-2">
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+      
+  <!-- 搜尋結果 -->
+  <div class="mx-5 my-3">
+    <h5 >需求案件</h5>
+  </div>
+
+  <div class="row g-3 mx-5" >
+    {% for case in cases %}
+      <div class="mb-4 col-sm-10 col-sm-mx-1 col-md-6 col-lg-4 col-xl-3 col-xl-mx-5 " >
+        <div class="mx-auto border border-600" style="height: 17rem; border-radius: 6px;">
+          <div class="card-body">
+            <div class="pb-2">
+              {% if case.care_type == 'home' %}
+              <span class="purple-border-tag">居家照顧</span>
+              {% endif %}
+              {% if case.care_type == 'hospital' %}
+              <span class="purple-border-tag">醫院看護</span>
+              {% endif %}
+              {% if case.is_continuous_time == True %}
+              <span class="purple-border-tag">連續時間</span>
+              {% endif %}
+              {% if case.is_continuous_time == False %}
+              <span class="purple-border-tag">指定時段</span>
+              {% endif %}
+            </div>
+            <p class="require-info my-2">開始時間：<br> {{case.start_datetime.year}}/{{case.start_datetime.month}}/{{case.start_datetime.day}} ({{case.startTimeformat}}) </p>
+            <p class="require-info my-2">結束時間：<br> {{case.end_datetime.year}}/{{case.end_datetime.month}}/{{case.end_datetime.day}} ({{case.endTimeformat}}) </p>
+            <hr>
+            <p class="require-info my-2">地點： {{case.city}} </p>
+            <div class="pt-3 row justify-content-between">
+              <div class="col-auto container">
+                <a href="{% url 'requirement_detail' %}?case={{case.id}}">
+                  <button class="small-purple-button">查看詳情</button>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+  </div>
+  <script>
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    const csrftoken = getCookie('csrftoken');
+  
+  </script>
+</main>
+
+{% endblock %}

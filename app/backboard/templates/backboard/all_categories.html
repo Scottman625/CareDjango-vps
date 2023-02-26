@@ -1,0 +1,51 @@
+{% extends 'backboard/base.html' %} {% block content %}
+{% load static %}
+
+<!-- 內容 -->
+  <div class="mb-3">
+    <div class="col-lg-12 ps-lg-2 mb-3">
+      <div class="card h-lg-100">
+        <div class="card-header">
+  
+          <div class="mb-3 d-flex justify-content-between">
+            所有文章類別
+            <a class="text-right custom-purple-btn text-white btn-sm " href="{% url 'new_edit_category' %}">新增類別</a>
+          </div>
+                    
+          <div id="tableExample2" data-list='{"valueNames":["name","email","age"],"page":10,"pagination":true}'>
+            <div class="table-responsive scrollbar">
+              <table class="table  table-striped fs--1 mb-0">
+                <div class="border border-1"></div>
+                <thead>
+                  <tr>
+                    <th scope="col">分類名稱</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody class="list">
+                  {% for category in categories %}
+                    <tr>
+                      <td>{{category.name}}</td>
+                      <td class="alnright">                    
+                        <a class="custom-purple-btn text-white btn-sm " href="{% url 'new_edit_category' %}?category_id={{category.id}}">編輯類別</a>
+                        <a class="bg-danger text-white btn-sm" href="{% url 'all_categories' %}?delete_id={{category.id}}" >刪除</a>
+                      </td>
+                    </tr> 
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <br>
+            <div class="d-flex justify-content-center mt-3">
+              <button class="btn btn-sm btn-chijia-default me-1" type="button" title="Previous" data-list-pagination="prev"><span class="fas fa-chevron-left"></span></button>
+              <ul class="pagination mb-0"></ul>
+              <button class="btn btn-sm btn-chijia-default ms-1" type="button" title="Next" data-list-pagination="next"><span class="fas fa-chevron-right"> </span></button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div> 
+        
+{% endblock %}

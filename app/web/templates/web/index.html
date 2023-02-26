@@ -1,0 +1,236 @@
+{% extends 'web/base.html' %} {% block content %}
+{% load static %}
+
+<main class="main bg-white" id="top" >
+  <style>
+    .datetimepicker tr:nth-child(2) td:last-child {
+      display: none;
+    }
+  </style>
+  <!-- main content -->
+  <section class="bg-frontpage-cover">
+    
+    <div class="container-fluid col-11 col-sm-10  col-md-7  col-xl-5 my-4 " >
+      
+          <span  class="mt-4 mx-3" style="color: white; font-size:30px;">
+            <strong>Care168 第三方預約照護平台</strong>
+          </span> 
+          
+          <!-- form content -->
+          <form method="post" enctype="multipart/form-data">{% csrf_token %}
+            <div class="card bg-white mt-2">
+              
+                <div class="mt-3  mb-3" style="margin-left: 10px; margin-right: 10px; display: flex;">
+                  <div class="segment__item">
+                    <input type="radio" class="segment__input"  id="care_type" name="care_type" value="居家照顧" checked>
+                    <div class="segment__button" style="font-size: 18px; height: 50px; padding-top: 6px;">居家照顧</div>
+                  </div>
+            
+                  <div class="segment__item">
+                    <input type="radio" class="segment__input"  id="care_type" name="care_type" value="醫院看護">
+                    <div class="segment__button" style="font-size: 18px; height: 50px; padding-top: 6px;">醫院看護</div>
+                  </div>
+                </div>
+
+                <!-- 照護地點 -->
+                <div class="row" style="margin-left: 10px;">
+                  <div class="col-xs-12 col-sm-4 inner title-font">&emsp;照護地點</div>
+
+                  <div class="col-sm-8">
+                    <div class="d-flex mt-1">
+                      <div class="me-2">
+                        <select class="dropdown-button" name="city" >
+                          {% for city in dict.citys %}
+                            <option style="text-align: center" value="{{city.id}}">{{city}}</option>
+                            <!-- <option value="醫院看護">醫院看護</option> -->
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- <div  class="col-1 inner" style="color: #BB6BD9;font-size:20px;">|</div> -->
+  
+                </div>
+              
+                  <hr size="4" class="mx-2" style="color: #BB6BD9;"/>
+
+                  <!-- 時間類型 -->
+                  <div class="row justify-content-start" style="margin-left: 10px;">
+                    <div class="col-xs-12 col-sm-4 inner title-font" >&emsp;時間類型</div>
+                    <div class="col-sm-8">
+                      <div class="d-flex mt-1">
+                        <div class="me-2">
+                          <label class="custom-radio-parent align-self-center" style="margin: 0px;">連續時間
+                            <input type="radio" checked="checked" name="is_continuous_time" id="is_continuous_time" value=True onchange="continuous_timeSelect()">
+                            <span class="checkmark"></span>
+                          </label>
+                        </div>
+                        <div class="">
+                          <label class="custom-radio-parent align-self-center" style="margin: 0px;">指定時段
+                            <input type="radio" name="is_continuous_time" id="is_continuous_time" value=False onchange="WeekdaySelect()">
+                            <span class="checkmark"></span>
+                          </label>
+                        </div>
+                      </div>
+
+
+                    </div>
+                    
+                  </div>
+                  <hr size="4" class="mx-2" style="color: #BB6BD9;"/>
+
+                  <!-- 每週時段 -->
+                  <div id="time_type_select"></div>
+                  <div class="row" style="margin-left: 10px;">
+                    <div class="col-4 inner title-font">&emsp;開始日期</div>
+                    <div class="col-8 " >
+                      <input class="modal-timePicker-button datetimepicker" id="datepicker_startDate" name="datepicker_startDate" type="text"  placeholder="年-月-日" data-options='{"disableMobile":true}' value="{{defaultStartDate}}" />
+
+                      <!-- <input class="timePicker-noBorder-button datetimepicker" style="width: 150px;" id="datetimepicker_start" name="datetimepicker_start" type="text" placeholder="年/月/日 時:分" data-options='{"enableTime":true,"dateFormat":"y/m/d H:i","disableMobile":true}' />          -->
+                    </div> 
+                  </div>
+                  
+                  <hr size="4" class="mx-2" style="color: #BB6BD9;"/>
+
+                  <div class="row" style="margin-left: 10px;">
+                    <div class="col-4 inner title-font">&emsp;結束日期</div>
+                    <div class="col-8" >
+                      <input class="modal-timePicker-button datetimepicker" id="datepicker_endDate" name="datepicker_endDate" type="text" placeholder="年-月-日" data-options='{"disableMobile":true}' value="{{defaultEndDate}}"  />
+                    </div> 
+                  </div>
+                  
+                  <hr size="4" class="mx-2" style="color: #BB6BD9;"/>
+                      
+                  <!-- 開始時間 -->
+                  <div class="row" style="margin-left: 10px;">
+                    <div class="col-4 inner title-font">&emsp;開始時間</div>
+                    <div class="col-8" >
+                      <input class="modal-timePicker-button datetimepicker" id="timepicker_startTime"  name="timepicker_startTime" type="text" placeholder="時:分" value="{{dict.start_time}}" data-options='{"enableTime":true,"noCalendar":true,"dateFormat":"H:i","disableMobile":true,"time_24hr":true}' />
+
+                      <!-- <input class="timePicker-noBorder-button datetimepicker" style="width: 150px;" id="datetimepicker_start" name="datetimepicker_start" type="text" placeholder="年/月/日 時:分" data-options='{"enableTime":true,"dateFormat":"y/m/d H:i","disableMobile":true}' />          -->
+                    </div> 
+                  </div>
+                  
+                  <hr size="4" class="mx-2" style="color: #BB6BD9;"/>
+                      
+                  <!-- 結束時間 -->
+                  <div class="row" style="margin-left: 10px;">
+                    <div class="col-4 title-font inner">&emsp;結束時間</div>
+                    <div class="col-8" >
+                      <input class="modal-timePicker-button datetimepicker" id="timepicker_endTime" name="timepicker_endTime" type="text" placeholder="時:分" value="{{dict.end_time}}" data-options='{"enableTime":true,"noCalendar":true,"dateFormat":"H:i","disableMobile":true,"time_24hr":true}' />
+
+                      <!-- <input class="timePicker-noBorder-button datetimepicker" style="width: 150px;" id="datetimepicker_end" name="datetimepicker_end" type="text" placeholder="年/月/日 時:分" data-options='{"enableTime":true,"dateFormat":"y/m/d H:i","disableMobile":true}' />          -->
+                    </div>
+                  </div>
+                
+                  <br>  
+                </div>
+
+                <button class="mt-4 full-purple-button"type="submit" name="submit"value="ok">
+                  <b>🔍 搜尋服務者</b>
+                </button>
+
+                {% comment %} <button class="mt-4 full-purple-button"  id="submit"  onclick="call.call_frontend()" >
+                  搜尋
+                </button> {% endcomment %}
+          </form>
+    </div>  
+    
+  </section>
+
+  <script type="text/javascript">
+    function getCookie(name){
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+                  }
+              }
+          }
+          return cookieValue;
+      }
+      const csrftoken = getCookie('csrftoken');
+      
+      const weekday_select = document.getElementById('time_type_select')
+      const select_continuous_time = document.getElementById('time_type_select')
+      function continuous_timeSelect(){
+        console.log('delete')
+        select_continuous_time.innerHTML = ``
+      }
+      function WeekdaySelect(){
+          weekday_select.innerHTML = ` 
+                  <div class="row justify-content-start" style="margin-left: 10px;">
+                    <div class="col-4  inner title-font" >&emsp;指定時段</div>
+                    <div class="col-8 weekdayCheck">
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" id="1" name="weekdays[]" type="checkbox" value="1" {% if "1" in weekday_list %} checked="" {% endif %} />
+                        <label class="h6" for="weekdays[]">星期一</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" id="2" name="weekdays[]" type="checkbox" value="2" {% if "2" in weekday_list %} checked="" {% endif %} />
+                        <label class="h6" for="weekdays[]">星期二</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" id="3" name="weekdays[]" type="checkbox" value="3" {% if "3" in weekday_list %} checked="" {% endif %} />
+                        <label class="h6" for="weekdays[]">星期三</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" id="4" name="weekdays[]" type="checkbox" value="4" {% if "4" in weekday_list %} checked="" {% endif %} />
+                        <label class="h6" for="weekdays[]">星期四</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" id="5" name="weekdays[]" type="checkbox" value="5" {% if "5" in weekday_list %} checked="" {% endif %} />
+                        <label class="h6" for="weekdays[]">星期五</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" id="6" name="weekdays[]" type="checkbox" value="6" {% if "6" in weekday_list %} checked="" {% endif %} />
+                        <label class="h6" for="weekdays[]">星期六</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" id="0" name="weekdays[]" type="checkbox" value="0" {% if "0" in weekday_list %} checked="" {% endif %} />
+                        <label class="h6" for="weekdays[]">星期日</label>
+                      </div>
+                    </div>
+                  </div>
+                  <hr size="4" class="mx-2" style="color: #BB6BD9;"/>
+                   `
+          document.querySelector('.weekdayCheck').addEventListener('change', event => {
+            event.preventDefault();
+            weekdays = []
+            checkboxes = document.querySelectorAll('input[type=checkbox]:checked')
+
+            for (var i = 0; i < checkboxes.length; i++) {
+              weekdays.push(checkboxes[i].value)
+                };
+                console.log(weekdays)
+          })
+          weekdays.forEach(e =>{
+            var element = document.getElementById(e)
+            element.checked = true;
+            console.log(element)
+          })
+          
+          }
+         
+    // $(function () {
+    //     $('#timepicker_startTime, #timepicker_endTime').datetimepicker({
+    //       format: 'HH:mm',
+    //       pickDate: false,
+    //       pickSeconds: false,
+    //       pick12HourFormat: false        
+    //     });
+    // });
+  </script>
+  
+</main>
+ 
+
+ 
+
+{% endblock %}
