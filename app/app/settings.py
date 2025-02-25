@@ -64,6 +64,10 @@ INSTALLED_APPS = [
     'ezpay_invoice',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+         'https://care168.stockfunction.cloud',
+     ]
+
 FIREBASE_APP = initialize_app()
 
 #Get the absolute path of the settings.py file's directory
