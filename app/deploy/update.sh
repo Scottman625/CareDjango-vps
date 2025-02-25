@@ -2,7 +2,7 @@
 
 set -e
 
-PROJECT_PATH='/usr/local/apps'
+PROJECT_PATH='/usr/local/apps/care168'
 
 git pull
 $PROJECT_PATH/env/bin/python3 -m pip install -r $PROJECT_PATH/requirements.txt
