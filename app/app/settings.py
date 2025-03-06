@@ -36,6 +36,8 @@ ALLOWED_HOSTS = [
     '0.0.0.0',
     'care168.stockfunction.cloud',
     'www.care168.stockfunction.cloud',
+    'backtestdog.ddns.net',
+    'www.backtestdog.ddns.net',
 ]
 
 ADMINS = (
