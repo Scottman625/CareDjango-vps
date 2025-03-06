@@ -33,6 +33,7 @@ ALLOWED_HOSTS = [
     'care168.com.tw',
     '149.28.22.217',
     '0.0.0.0',
+    'care168.stockfunction.cloud',
     '*',
 ]
 
