@@ -39,6 +39,7 @@ ALLOWED_HOSTS = [
     'backtestdog.ddns.net',
     'www.backtestdog.ddns.net',
     '192.168.50.200',
+    '192.168.50.200:79'
 ]
 
 ADMINS = (
