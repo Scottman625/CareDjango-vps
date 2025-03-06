@@ -28,18 +28,18 @@ SECRET_KEY = 'django-insecure-^pxr2pc@d81=s1*hh9t_pcs4^a-pazd_+@lv40nscf7-oh$&4w
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "202.182.105.11",
-    '127.0.0.1',
-    'localhost',
-    'care168.com.tw',
-    '149.28.22.217',
-    '0.0.0.0',
-    'care168.stockfunction.cloud',
-    'www.care168.stockfunction.cloud',
-    'backtestdog.ddns.net',
-    'www.backtestdog.ddns.net',
-    '192.168.50.200',
-    '192.168.50.200:79'
+    # "202.182.105.11",
+    # '127.0.0.1',
+    # 'localhost',
+    # 'care168.com.tw',
+    # '149.28.22.217',
+    # '0.0.0.0',
+    # 'care168.stockfunction.cloud',
+    # 'www.care168.stockfunction.cloud',
+    # 'backtestdog.ddns.net',
+    # 'www.backtestdog.ddns.net',
+    # '192.168.50.200',
+    # '192.168.50.200:79'
 ]
 
 ADMINS = (
